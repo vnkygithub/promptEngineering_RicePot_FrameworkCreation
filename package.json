@@ -1,0 +1,28 @@
+{
+  "name": "wingify-playwright-framework",
+  "version": "1.0.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed --workers=1",
+    "test:valid": "playwright test src/tests/login.valid.spec.ts",
+    "test:invalid": "playwright test src/tests/login.invalid.spec.ts",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "allure:serve": "allure serve allure-results",
+    "report:html": "playwright show-report playwright-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Playwright + TypeScript POM framework for Wingify login",
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^26.6.6",
+    "allure-commandline": "^2.46.1",
+    "allure-js-commons": "^3.14.0",
+    "allure-playwright": "^3.14.0",
+    "dotenv": "^18.0.9",
+    "typescript": "^7.0.2"
+  }
+}
