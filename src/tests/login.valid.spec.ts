@@ -1,6 +1,7 @@
 import * as allure from 'allure-js-commons';
 import { test, expect, failWithEvidence } from '../fixtures/customFixtures';
 import { Environment } from '../config/env';
+import { AutomationException } from '../core/AutomationException';
 import { LoginMessages } from '../locators/LoginLocators';
 
 test.describe('Wingify Login - Valid Scenarios', () => {
@@ -96,24 +97,28 @@ test.describe('Wingify Login - Valid Scenarios', () => {
     }
   });
 
-  test('TC_LOGIN_VALID_05 - User logs in successfully with valid credentials and Remember me', async ({ loginPage, dashboardPage }, testInfo) => {
-    await allure.severity(allure.Severity.BLOCKER);
-    const credentials = Environment.validCredentials();
-    test.skip(!credentials, 'Insufficient information to determine. Set WINGIFY_EMAIL and WINGIFY_PASSWORD in .env');
-    try {
-      await test.step('Enter valid credentials, check Remember me and click Sign in', async () => {
-        await loginPage.login(credentials!, true);
-      });
-      await test.step('Verify user is navigated away from the login page', async () => {
-        await dashboardPage.waitUntilLoaded();
-        expect(dashboardPage.currentUrl()).not.toMatch(/#\/login/);
-        await expect(dashboardPage.loginForm).toBeHidden();
-      });
-      await test.step('Verify no authentication error is displayed', async () => {
-        await expect(loginPage.errorNotificationBox).toBeHidden();
-      });
-    } catch (error) {
-      await failWithEvidence(testInfo, dashboardPage, error);
-    }
+  test.describe('Authenticated session', () => {
+    test.use({ trace: 'off', video: 'off', screenshot: 'off' });
+
+    test('TC_LOGIN_VALID_05 - User logs in successfully with valid credentials and Remember me', async ({ loginPage, dashboardPage }) => {
+      await allure.severity(allure.Severity.BLOCKER);
+      const credentials = Environment.validCredentials();
+      test.skip(!credentials, 'Insufficient information to determine. Set WINGIFY_EMAIL and WINGIFY_PASSWORD in .env');
+      try {
+        await test.step('Enter valid credentials, check Remember me and click Sign in', async () => {
+          await loginPage.login(credentials!, true);
+        });
+        await test.step('Verify user is navigated away from the login page', async () => {
+          await dashboardPage.waitUntilLoaded();
+          expect(dashboardPage.currentUrl()).not.toMatch(/#\/login/);
+          await expect(dashboardPage.loginForm).toBeHidden();
+        });
+        await test.step('Verify no authentication error is displayed', async () => {
+          await expect(loginPage.errorNotificationBox).toBeHidden();
+        });
+      } catch (error) {
+        throw error instanceof AutomationException ? error : new AutomationException('validLogin', 'Login with valid credentials', error);
+      }
+    });
   });
 });
